@@ -1,9 +1,16 @@
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
 import psycopg2
 
 # Load .env from project root (parent of db directory)
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '..', '.env'))
+
+# Retrieve DATABASE_URL from environment
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Fail loudly if DATABASE_URL is missing
+if not DATABASE_URL:
+    raise RuntimeError("❌ DATABASE_URL not found. Make sure .env is loaded or Render env variable is set.")
 
 def get_connection():
     """
@@ -11,25 +18,18 @@ def get_connection():
     Returns:
         psycopg2.extensions.connection: PostgreSQL connection object
     """
-    database_url = os.getenv("DATABASE_URL")
-    
-    # Debug logging (without credentials)
-    if database_url:
-        # Extract host from URL for debugging (without credentials)
-        try:
-            if database_url.startswith('postgresql://'):
-                host_part = database_url.split('@')[1].split('/')[0]
-                print(f"🔧 Connecting to database host: {host_part}")
-            else:
-                print(f"🔧 Database URL format: {database_url[:20]}...")
-        except:
-            print("🔧 Database URL loaded (format check failed)")
-    else:
-        print("❌ DATABASE_URL environment variable is not set!")
-        raise ValueError("DATABASE_URL environment variable is not set.")
-    
-    conn = psycopg2.connect(database_url)
-    return conn
+    try:
+        # Use psycopg2.connect with DATABASE_URL
+        conn = psycopg2.connect(DATABASE_URL)
+        
+        # Safe debug print - only log the host part
+        host_part = DATABASE_URL.split('@')[-1].split('/')[0]
+        print(f"✅ Connected to database: {host_part}")
+        
+        return conn
+    except psycopg2.Error as e:
+        print(f"❌ Database connection failed: {e}")
+        raise RuntimeError(f"Failed to connect to database: {e}")
 
 def close_connection(connection):
     """
@@ -38,4 +38,8 @@ def close_connection(connection):
         connection: Database connection to close
     """
     if connection:
-        connection.close()
+        try:
+            connection.close()
+            print("✅ Database connection closed")
+        except Exception as e:
+            print(f"⚠️ Warning: Error closing database connection: {e}")
