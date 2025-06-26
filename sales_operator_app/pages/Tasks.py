@@ -40,9 +40,12 @@ def main():
                 if meta:
                     st.caption(" | ".join(meta))
             if checked:
-                mark_task_done(task['id'])
-                st.success(f"Task '{task['title']}' marked as done!")
-                st.experimental_rerun()
+                try:
+                    mark_task_done(task['id'])
+                    st.success(f"Task '{task['title']}' marked as done!")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Failed to mark task as done: {str(e)}")
 
         st.markdown("---")
 
@@ -91,9 +94,12 @@ def main():
                         st.markdown('-')
                 with cols[7]:
                     if st.button("Mark Done", key=f"done_{task['id']}"):
-                        mark_task_done(task['id'])
-                        st.success(f"Task '{task['title']}' marked as done!")
-                        st.experimental_rerun()
+                        try:
+                            mark_task_done(task['id'])
+                            st.success(f"Task '{task['title']}' marked as done!")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Failed to mark task as done: {str(e)}")
 
         st.markdown("---")
 
@@ -135,11 +141,15 @@ def main():
             if due_date:
                 data["due_date"] = due_date.strftime("%Y-%m-%d")
             
-            if add_task(data):
-                st.success(f"Task '{title}' added!")
-                st.experimental_rerun()
-            else:
-                st.error("Failed to add task. Please check your input.")
+            try:
+                if add_task(data):
+                    st.success(f"Task '{title}' added!")
+                    st.rerun()
+                else:
+                    st.error("Failed to add task. Please check your input.")
+            except Exception as e:
+                st.error("Failed to add task.")
+                st.error(str(e))
 
 if __name__ == "__main__":
     main() 
