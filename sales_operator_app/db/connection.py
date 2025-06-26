@@ -1,37 +1,25 @@
-import sqlite3
+from dotenv import load_dotenv
+load_dotenv()
 import os
-from pathlib import Path
+import psycopg2
 
 def get_connection():
     """
-    Get a connection to the SQLite database.
-    
+    Get a connection to the PostgreSQL database using DATABASE_URL from environment variables.
     Returns:
-        sqlite3.Connection: Database connection object
+        psycopg2.extensions.connection: PostgreSQL connection object
     """
-    # Get the directory where this file is located
-    db_dir = Path(__file__).parent
-    
-    # Create the database file path
-    db_path = db_dir / "sales_operator.db"
-    
-    # Create connection with check_same_thread=False for Streamlit compatibility
-    connection = sqlite3.connect(
-        str(db_path),
-        check_same_thread=False
-    )
-    
-    # Enable foreign keys
-    connection.execute("PRAGMA foreign_keys = ON")
-    
-    return connection
+    database_url = os.getenv("DATABASE_URL")
+    if not database_url:
+        raise ValueError("DATABASE_URL environment variable is not set.")
+    conn = psycopg2.connect(database_url)
+    return conn
 
 def close_connection(connection):
     """
     Close the database connection.
-    
     Args:
-        connection (sqlite3.Connection): Database connection to close
+        connection: Database connection to close
     """
     if connection:
         connection.close()

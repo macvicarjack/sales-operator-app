@@ -1,4 +1,6 @@
 streamlit
 streamlit-aggrid
 streamlit-elements
-pytest 
+psycopg2-binary
+pytest
+python-dotenv 

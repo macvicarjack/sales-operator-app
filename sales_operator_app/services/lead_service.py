@@ -2,8 +2,7 @@
 Lead service for managing lead data in the Sales Operator app.
 """
 
-from db.connection import get_connection
-import sqlite3
+from db.postgres_connection import get_connection
 from typing import List, Dict, Any
 
 def get_all_leads() -> List[Dict[str, Any]]:
@@ -20,7 +19,6 @@ def get_all_leads() -> List[Dict[str, Any]]:
             - created_at: Creation timestamp
     """
     try:
-        # Get database connection
         conn = get_connection()
         cursor = conn.cursor()
         
@@ -49,9 +47,6 @@ def get_all_leads() -> List[Dict[str, Any]]:
         
         return leads
         
-    except sqlite3.Error as e:
-        print(f"Database error: {e}")
-        return []
     except Exception as e:
         print(f"Error fetching leads: {e}")
         return []
@@ -79,15 +74,17 @@ def add_lead(name: str, company: str, email: str, status: str) -> bool:
             print("Error: Name is required")
             return False
         
-        # Get database connection
         conn = get_connection()
         cursor = conn.cursor()
         
         # Insert the new lead using parameterized SQL
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT INTO leads (name, company, email, status)
-            VALUES (?, ?, ?, ?)
-        """, (name.strip(), company.strip(), email.strip(), status))
+            VALUES (%s, %s, %s, %s)
+            """,
+            (name.strip(), company.strip(), email.strip(), status)
+        )
         
         # Commit the changes
         conn.commit()
@@ -95,9 +92,6 @@ def add_lead(name: str, company: str, email: str, status: str) -> bool:
         print(f"✅ Successfully added lead: {name}")
         return True
         
-    except sqlite3.Error as e:
-        print(f"Database error: {e}")
-        return False
     except Exception as e:
         print(f"Error adding lead: {e}")
         return False
@@ -120,11 +114,14 @@ def get_lead_by_id(lead_id: int) -> Dict[str, Any]:
         conn = get_connection()
         cursor = conn.cursor()
         
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT id, name, company, email, status, created_at 
             FROM leads 
-            WHERE id = ?
-        """, (lead_id,))
+            WHERE id = %s
+            """,
+            (lead_id,)
+        )
         
         row = cursor.fetchone()
         
@@ -139,8 +136,8 @@ def get_lead_by_id(lead_id: int) -> Dict[str, Any]:
             }
         return None
         
-    except sqlite3.Error as e:
-        print(f"Database error: {e}")
+    except Exception as e:
+        print(f"Error fetching lead by id: {e}")
         return None
     finally:
         if 'conn' in locals():

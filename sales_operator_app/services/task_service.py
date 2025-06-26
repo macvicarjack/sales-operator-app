@@ -2,8 +2,7 @@
 Task service for managing tasks in the Sales Operator app.
 """
 
-from db.connection import get_connection
-import sqlite3
+from db.postgres_connection import get_connection
 from typing import List, Dict, Any
 import datetime
 from utils.config import (
@@ -25,9 +24,8 @@ def add_task(data: dict) -> bool:
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        # Build columns and values from the data dict
         columns = ', '.join(data.keys())
-        placeholders = ', '.join(['?' for _ in data])
+        placeholders = ', '.join(['%s' for _ in data])
         values = list(data.values())
         sql = f"INSERT INTO tasks ({columns}) VALUES ({placeholders})"
         cursor.execute(sql, values)
@@ -51,11 +49,11 @@ def get_open_tasks() -> List[Dict[str, Any]]:
         cursor = conn.cursor()
         sql = '''
             SELECT * FROM tasks
-            WHERE status != 'done'
+            WHERE status != %s
             ORDER BY 
                 CASE WHEN next_followup_date IS NOT NULL THEN next_followup_date ELSE created_at END ASC
         '''
-        cursor.execute(sql)
+        cursor.execute(sql, ('done',))
         rows = cursor.fetchall()
         columns = [desc[0] for desc in cursor.description]
         return [dict(zip(columns, row)) for row in rows]
@@ -77,10 +75,10 @@ def get_quick_tasks() -> List[Dict[str, Any]]:
         cursor = conn.cursor()
         sql = '''
             SELECT * FROM tasks
-            WHERE type = 'quick' AND status != 'done'
+            WHERE type = %s AND status != %s
             ORDER BY due_date ASC
         '''
-        cursor.execute(sql)
+        cursor.execute(sql, ('quick', 'done'))
         rows = cursor.fetchall()
         columns = [desc[0] for desc in cursor.description]
         return [dict(zip(columns, row)) for row in rows]
@@ -104,10 +102,10 @@ def mark_task_done(task_id: int) -> bool:
         cursor = conn.cursor()
         sql = '''
             UPDATE tasks
-            SET status = 'done', completed_at = CURRENT_TIMESTAMP
-            WHERE id = ?
+            SET status = %s, completed_at = CURRENT_TIMESTAMP
+            WHERE id = %s
         '''
-        cursor.execute(sql, (task_id,))
+        cursor.execute(sql, ('done', task_id))
         conn.commit()
         return cursor.rowcount > 0
     except Exception as e:

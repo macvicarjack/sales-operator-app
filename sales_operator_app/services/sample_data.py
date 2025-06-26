@@ -33,11 +33,14 @@ def add_sample_leads():
             ("Maria Garcia", "Future Tech", "maria.garcia@futuretech.com", "new"),
         ]
         
-        # Insert sample leads
-        cursor.executemany("""
+        # Insert sample leads (PostgreSQL: use %s)
+        cursor.executemany(
+            """
             INSERT INTO leads (name, company, email, status)
-            VALUES (?, ?, ?, ?)
-        """, sample_leads)
+            VALUES (%s, %s, %s, %s)
+            """,
+            sample_leads
+        )
         
         # Commit the changes
         conn.commit()
