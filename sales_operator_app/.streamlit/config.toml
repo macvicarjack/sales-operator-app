@@ -1,0 +1,20 @@
+[global]
+developmentMode = false
+
+[theme]
+base = "light"
+primaryColor = "#4A90E2"
+backgroundColor = "#F9FAFB"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#222222"
+font = "sans serif"
+
+[client]
+showErrorDetails = false
+
+[browser]
+gatherUsageStats = false
+
+[server]
+enableCORS = false
+enableXsrfProtection = false

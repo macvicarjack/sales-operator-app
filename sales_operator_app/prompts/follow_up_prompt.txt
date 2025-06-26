@@ -1,0 +1,8 @@
+Subject: Following up on our conversation
+
+Hi {{ contact_name }},
+
+Just checking in about {{ task_description }}. Let me know if there's anything else you need or if I can help move things forward.
+
+Best,
+{{ your_name }} 
