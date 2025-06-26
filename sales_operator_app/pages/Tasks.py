@@ -42,6 +42,7 @@ def main():
             if checked:
                 mark_task_done(task['id'])
                 st.success(f"Task '{task['title']}' marked as done!")
+                st.experimental_rerun()
 
         st.markdown("---")
 
@@ -92,6 +93,7 @@ def main():
                     if st.button("Mark Done", key=f"done_{task['id']}"):
                         mark_task_done(task['id'])
                         st.success(f"Task '{task['title']}' marked as done!")
+                        st.experimental_rerun()
 
         st.markdown("---")
 
@@ -135,6 +137,7 @@ def main():
             
             if add_task(data):
                 st.success(f"Task '{title}' added!")
+                st.experimental_rerun()
             else:
                 st.error("Failed to add task. Please check your input.")
 
