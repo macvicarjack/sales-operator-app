@@ -1,5 +1,7 @@
 from dotenv import load_dotenv
-load_dotenv()
+import os
+# Load .env from parent directory (project root)
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 import streamlit as st
 
 # Page configuration

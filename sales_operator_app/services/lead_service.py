@@ -2,8 +2,10 @@
 Lead service for managing lead data in the Sales Operator app.
 """
 
-from db.postgres_connection import get_connection
+import logging
+from datetime import datetime
 from typing import List, Dict, Any
+from db.connection import get_connection
 
 def get_all_leads() -> List[Dict[str, Any]]:
     """

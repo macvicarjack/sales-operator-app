@@ -2,9 +2,10 @@
 Task service for managing tasks in the Sales Operator app.
 """
 
-from db.postgres_connection import get_connection
-from typing import List, Dict, Any
-import datetime
+import logging
+from datetime import datetime
+from typing import List, Optional, Dict, Any
+from db.connection import get_connection
 from utils.config import (
     TIER_WEIGHTS,
     TASK_SCORE_WEIGHTS,
