@@ -144,12 +144,12 @@ def calculate_task_score(task: dict) -> float:
             return None
         try:
             if date_only:
-                return datetime.datetime.strptime(val, "%Y-%m-%d").date()
-            return datetime.datetime.fromisoformat(val)
+                return datetime.strptime(val, "%Y-%m-%d").date()
+            return datetime.fromisoformat(val)
         except Exception:
             return None
 
-    now = datetime.datetime.now()
+    now = datetime.now()
     today = now.date()
 
     # 1. Days since last action (weighted by TASK_SCORE_WEIGHTS["days_open"])
