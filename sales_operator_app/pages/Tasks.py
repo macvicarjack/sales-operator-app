@@ -74,10 +74,20 @@ def main():
                     st.markdown(f"**{task['score']:.1f}**")
                 with cols[5]:
                     last_action = task.get('last_action_date') or task.get('created_at')
-                    st.markdown(last_action.split(' ')[0] if last_action else '-')
+                    if isinstance(last_action, str):
+                        st.markdown(last_action.split(' ')[0])
+                    elif isinstance(last_action, datetime):
+                        st.markdown(last_action.strftime('%Y-%m-%d'))
+                    else:
+                        st.markdown('-')
                 with cols[6]:
                     next_followup = task.get('next_followup_date')
-                    st.markdown(next_followup.split(' ')[0] if next_followup else '-')
+                    if isinstance(next_followup, str):
+                        st.markdown(next_followup.split(' ')[0])
+                    elif isinstance(next_followup, datetime):
+                        st.markdown(next_followup.strftime('%Y-%m-%d'))
+                    else:
+                        st.markdown('-')
                 with cols[7]:
                     if st.button("Mark Done", key=f"done_{task['id']}"):
                         mark_task_done(task['id'])
