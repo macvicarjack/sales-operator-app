@@ -22,17 +22,31 @@ def add_task(data: dict) -> bool:
         bool: True if successful, False otherwise.
     """
     try:
+        # Log the parameters being passed into the SQL query
+        print("🔧 Adding task with parameters:")
+        for key, value in data.items():
+            print(f"   {key}: {value}")
+        
         conn = get_connection()
         cursor = conn.cursor()
         columns = ', '.join(data.keys())
         placeholders = ', '.join(['%s' for _ in data])
         values = list(data.values())
         sql = f"INSERT INTO tasks ({columns}) VALUES ({placeholders})"
+        
+        print(f"🔧 SQL Query: {sql}")
+        print(f"🔧 Values: {values}")
+        
         cursor.execute(sql, values)
         conn.commit()
+        
+        print(f"✅ Successfully added task with ID: {cursor.fetchone()[0] if cursor.description else 'unknown'}")
         return True
+        
     except Exception as e:
-        print(f"Error adding task: {e}")
+        print("❌ DB ERROR: Failed to add task")
+        print(f"❌ Error details: {e}")
+        print(f"❌ Data that failed: {data}")
         return False
     finally:
         if 'conn' in locals():

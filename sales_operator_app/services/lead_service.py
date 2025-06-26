@@ -71,20 +71,32 @@ def add_lead(name: str, company: str, email: str, status: str) -> bool:
     try:
         # Validate required fields
         if not name.strip():
-            print("Error: Name is required")
+            print("❌ Error: Name is required")
             return False
+        
+        # Log the parameters being passed into the SQL query
+        print("🔧 Adding lead with parameters:")
+        print(f"   name: {name}")
+        print(f"   company: {company}")
+        print(f"   email: {email}")
+        print(f"   status: {status}")
         
         conn = get_connection()
         cursor = conn.cursor()
         
+        # Prepare values for insert
+        values = (name.strip(), company.strip(), email.strip(), status)
+        
         # Insert the new lead using parameterized SQL
-        cursor.execute(
-            """
+        sql = """
             INSERT INTO leads (name, company, email, status)
             VALUES (%s, %s, %s, %s)
-            """,
-            (name.strip(), company.strip(), email.strip(), status)
-        )
+        """
+        
+        print(f"🔧 SQL Query: {sql.strip()}")
+        print(f"🔧 Values: {values}")
+        
+        cursor.execute(sql, values)
         
         # Commit the changes
         conn.commit()
@@ -93,7 +105,9 @@ def add_lead(name: str, company: str, email: str, status: str) -> bool:
         return True
         
     except Exception as e:
-        print(f"Error adding lead: {e}")
+        print("❌ DB ERROR: Failed to add lead")
+        print(f"❌ Error details: {e}")
+        print(f"❌ Parameters that failed: name='{name}', company='{company}', email='{email}', status='{status}'")
         return False
     finally:
         # Close the connection
